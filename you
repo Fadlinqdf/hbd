@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selamat Ulang Tahun</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Manrope:wght@400;500;700&display=swap');
+
+  :root{
+    --bg-deep: #241531;
+    --bg-mid: #362448;
+    --gold: #F3B94C;
+    --coral: #FF7A66;
+    --cream: #FBF2E4;
+    --lavender: #C8B6DA;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(ellipse at 50% -10%, var(--bg-mid), var(--bg-deep) 65%);
+    color: var(--cream);
+    font-family: 'Manrope', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  .stage{
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6vh 6vw 10vh;
+    text-align: center;
+  }
+
+  .balloon{
+    position: absolute;
+    border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%;
+    opacity: 0.9;
+    filter: drop-shadow(0 12px 18px rgba(0,0,0,0.25));
+    animation: drift 7s ease-in-out infinite;
+  }
+  .balloon::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 1px;
+    height: 80px;
+    background: rgba(251,242,228,0.35);
+  }
+  .b1{ width: 64px; height: 78px; background: var(--coral); top: 8%; left: 10%; animation-delay: 0s; }
+  .b2{ width: 46px; height: 58px; background: var(--gold); top: 18%; left: 82%; animation-delay: 1.2s; }
+  .b3{ width: 54px; height: 66px; background: var(--lavender); top: 62%; left: 4%; animation-delay: 2.1s; }
+  .b4{ width: 40px; height: 50px; background: var(--coral); top: 70%; left: 88%; animation-delay: 0.6s; }
+
+  @keyframes drift{
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-16px) rotate(2deg); }
+  }
+
+  .eyebrow-none{ height: 1px; } /* intentionally no label chrome above headline */
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(2.4rem, 6vw, 4.6rem);
+    line-height: 1.05;
+    margin: 0 0 0.6rem;
+    max-width: 16ch;
+  }
+
+  h1 [contenteditable]{
+    color: var(--gold);
+    border-bottom: 3px solid rgba(243,185,76,0.4);
+    padding: 0 0.15em;
+    outline: none;
+    cursor: text;
+  }
+  h1 [contenteditable]:focus{
+    border-bottom-color: var(--gold);
+  }
+
+  .sub{
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    color: var(--lavender);
+    max-width: 46ch;
+    line-height: 1.6;
+    margin: 0 0 3rem;
+  }
+
+  .cake-wrap{
+    position: relative;
+    width: 200px;
+    margin-bottom: 2.6rem;
+    cursor: pointer;
+  }
+
+  svg{ display: block; width: 100%; height: auto; }
+
+  .flame{
+    transform-origin: center bottom;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .cake-wrap.blown .flame{
+    opacity: 0;
+    transform: scaleY(0.2) translateY(6px);
+  }
+
+  .hint{
+    font-size: 0.85rem;
+    color: rgba(251,242,228,0.55);
+    margin-top: 0.9rem;
+    letter-spacing: 0.01em;
+  }
+
+  .message-card{
+    background: rgba(251,242,228,0.06);
+    border: 1px solid rgba(251,242,228,0.14);
+    border-radius: 18px;
+    padding: 2rem 2.2rem;
+    max-width: 520px;
+    backdrop-filter: blur(6px);
+  }
+
+  .message-card p{
+    font-size: 1.05rem;
+    line-height: 1.75;
+    margin: 0;
+  }
+  .message-card p + p{ margin-top: 1rem; }
+
+  .message-card [contenteditable]{ outline: none; }
+  .message-card [contenteditable]:focus{
+    background: rgba(243,185,76,0.08);
+    border-radius: 4px;
+  }
+
+  .signature{
+    margin-top: 1.6rem;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--gold);
+  }
+
+  #confetti-canvas{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .balloon{ animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="stage">
+  <div class="balloon b1"></div>
+  <div class="balloon b2"></div>
+  <div class="balloon b3"></div>
+  <div class="balloon b4"></div>
+
+  <h1>Selamat Ulang Tahun, <span contenteditable="true" spellcheck="false">Kamu</span>!</h1>
+  <p class="sub">Klik lilinnya untuk meniup, lalu ketuk namanya di atas dan pesan di bawah untuk diubah sesuai keinginanmu.</p>
+
+  <div class="cake-wrap" id="cakeWrap">
+    <svg viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="150" rx="86" ry="14" fill="#000" opacity="0.18"/>
+      <rect x="30" y="100" width="140" height="46" rx="8" fill="#3D2A54"/>
+      <rect x="30" y="100" width="140" height="12" fill="#4A3364"/>
+      <rect x="42" y="66" width="116" height="40" rx="8" fill="#FF7A66"/>
+      <rect x="42" y="66" width="116" height="10" fill="#FF9788"/>
+      <rect x="58" y="30" width="14" height="38" rx="4" fill="#F3B94C"/>
+      <rect x="93" y="24" width="14" height="44" rx="4" fill="#F3B94C"/>
+      <rect x="128" y="30" width="14" height="38" rx="4" fill="#F3B94C"/>
+      <g class="flame">
+        <ellipse cx="65" cy="24" rx="6" ry="10" fill="#FFD98A"/>
+        <ellipse cx="100" cy="18" rx="6.5" ry="11" fill="#FFD98A"/>
+        <ellipse cx="135" cy="24" rx="6" ry="10" fill="#FFD98A"/>
+      </g>
+    </svg>
+    <div class="hint" id="cakeHint">tiup lilinnya ✨</div>
+  </div>
+
+  <div class="message-card">
+    <p contenteditable="true" spellcheck="false">Semoga di tahun yang baru ini kamu makin sehat, makin bahagia, dan makin dekat dengan semua hal baik yang kamu perjuangkan.</p>
+    <p contenteditable="true" spellcheck="false">Terima kasih sudah jadi orang yang selalu bikin hari-hari terasa lebih ringan. Semoga semua harapanmu tahun ini benar-benar terwujud.</p>
+    <p class="signature">— dengan hangat, orang yang menyayangimu</p>
+  </div>
+</div>
+
+<script>
+  const cakeWrap = document.getElementById('cakeWrap');
+  const cakeHint = document.getElementById('cakeHint');
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let animId = null;
+
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const colors = ['#F3B94C', '#FF7A66', '#C8B6DA', '#FBF2E4'];
+
+  function burst(){
+    const cx = canvas.width / 2;
+    const cy = canvas.height * 0.4;
+    for(let i = 0; i < 90; i++){
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 3 + Math.random() * 6;
+      particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 2,
+        size: 4 + Math.random() * 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.3,
+        life: 0
+      });
+    }
+    if(!animId) animate();
+  }
+
+  function animate(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.vy += 0.12;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.life++;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, 1 - p.life / 140);
+      ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+      ctx.restore();
+    });
+    particles = particles.filter(p => p.life < 140);
+    if(particles.length > 0){
+      animId = requestAnimationFrame(animate);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      animId = null;
+    }
+  }
+
+  cakeWrap.addEventListener('click', () => {
+    if(cakeWrap.classList.contains('blown')) return;
+    cakeWrap.classList.add('blown');
+    cakeHint.textContent = 'semoga semua permintaanmu terkabul 🎉';
+    burst();
+  });
+</script>
+
+</body>
+</html>
